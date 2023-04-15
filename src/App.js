@@ -1,10 +1,11 @@
 import './App.css';
 import Header from './components/header/Header';
+import AddItem from './components/addItem/AddItem';
 import Content from './components/content/Content';
 import Footer from './components/footer/Footer';
 import { useState } from 'react';
 function App() {
-
+  const [addItem, setAddItem] = useState('');
   const [data, setData] = useState([
     {
       id: 1,
@@ -25,24 +26,55 @@ function App() {
     },
   ]);
 
-    const handleCheck = (id) => {
-      const items = data.map((el) =>
-        el.id === id ? { ...el, checked: !el.checked } : el
-      );
-      setData(items);
-      localStorage.setItem('items', JSON.stringify(items));
+  const setAndSaveItems = (lists) => {
+    setData(lists);
+    localStorage.setItem('items', JSON.stringify(lists));
+  };
+
+  const newItem = (item) => {
+    const id = data.length ? data[data.length - 1].id + 1 : 1;
+    item = {
+      id,
+      checked: false,
+      item,
     };
 
-    const handleDelete = (id) => {
-      const items = data.filter((el) => el.id !== id);
-      setData(items);
-    };
+    const items = [ ...data, item ];
+    setAndSaveItems(items);
+  };
 
+  const handleCheck = (id) => {
+    const items = data.map((el) =>
+      el.id === id ? { ...el, checked: !el.checked } : el
+    );
+    setAndSaveItems(items);
+  };
+
+  const handleDelete = (id) => {
+    const items = data.filter((el) => el.id !== id);
+    setAndSaveItems(items);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!AddItem) return;
+    newItem(addItem);
+    setAddItem('');
+  };
 
   return (
     <div className="App">
       <Header />
-      <Content data={data} handleCheck={handleCheck} handleDelete={handleDelete} />
+      <AddItem
+        addItem={addItem}
+        setAddItem={setAddItem}
+        handleSubmit={handleSubmit}
+      />
+      <Content
+        data={data}
+        handleCheck={handleCheck}
+        handleDelete={handleDelete}
+      />
       <Footer length={data.length} />
     </div>
   );
