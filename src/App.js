@@ -8,6 +8,9 @@ import apiRequest from './utils/apiRequest';
 import { useState, useEffect } from 'react';
 function App() {
   const API_URL = 'http://localhost:3500/items';
+  const updateAndDelete = (id) => {
+    return `${API_URL}/${id}`;
+  }
   const [data, setData] = useState([]);
   const [addItem, setAddItem] = useState('');
   const [search, setSearch] = useState('');
@@ -74,16 +77,22 @@ function App() {
         item:newItem.item
       }),
     };
-
-    const url = `${API_URL}/${id}`;
-    console.log(url);
+    const url = updateAndDelete(id)
     const response = await apiRequest(url, updateOptions);
     if (response) setFetchError(response);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const items = data.filter((el) => el.id !== id);
     setData(items);
+
+    const url = updateAndDelete(id)
+    const deleteOptions = {
+      method: "delete",
+      mode:'cors'
+    }
+    const response = await apiRequest(url, deleteOptions)
+    if(response) setFetchError(response)
   };
 
   const handleSubmit = (e) => {
